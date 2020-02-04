@@ -1,0 +1,58 @@
+====================================================================================
+Q1
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l tinyMaze -p SearchAgent
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumMaze -p SearchAgent
+c:/python27/python.exe pacman.py --frameTime 0 -l bigMaze -z .5 -p SearchAgent
+
+
+====================================================================================
+Q2
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumMaze -p SearchAgent -a fn=bfs
+c:/python27/python.exe pacman.py --frameTime 0 -l bigMaze -p SearchAgent -a fn=bfs -z .5
+
+
+====================================================================================
+Q3
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumMaze -p SearchAgent -a fn=ucs
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumDottedMaze -p StayEastSearchAgent
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumScaryMaze -p StayWestSearchAgent
+
+
+====================================================================================
+Q4
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+
+
+====================================================================================
+Q5
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l tinyCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+
+
+====================================================================================
+Q6
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l mediumCorners -p AStarCornersAgent -z 0.5
+
+
+====================================================================================
+Q7
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l trickySearch -p AStarFoodSearchAgent
+
+
+====================================================================================
+Q8
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l bigSearch -p ClosestDotSearchAgent -z .5 
+
+
+====================================================================================
+Extra
+====================================================================================
+c:/python27/python.exe pacman.py --frameTime 0 -l bigSearch -p ApproximateSearchAgent -z .5 -q 
