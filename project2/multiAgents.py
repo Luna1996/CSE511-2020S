@@ -1,15 +1,15 @@
 # multiAgents.py
 # --------------
 # Licensing Information: Please do not distribute or publish solutions to this
-# project. You are free to use and extend these projects for educational
-# purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
+# project.  You are free to use and extend these projects for educational
+# purposes.  The Pacman AI projects were developed at UC Berkeley, primarily by
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
-
 from util import manhattanDistance
 from game import Directions
-import random, util
-from mypy import MinimaxDecision, AlphaBetaMiniMaxDecsion
+import random
+import util
+from mypy import MinimaxDecision, AlphaBetaMiniMaxDecsion, ExpectedMiniMaxDecision, mazeDistance
 
 from game import Agent
 
@@ -86,13 +86,13 @@ class ReflexAgent(Agent):
     
     score = 0
     if(len(newFoodDistances) == 0):
-        score = 100000000*successorGameState.getScore()
+        score = 100000000 * successorGameState.getScore()
     elif(min(newGhostDistances) > 2):
-        score = 100000000*successorGameState.getScore() + (100/(min(newFoodDistances)+1)) - (1/(min(newGhostDistances)+1))
+        score = 100000000 * successorGameState.getScore() + (100 / (min(newFoodDistances) + 1)) - (1 / (min(newGhostDistances) + 1))
         if(action == Directions.STOP):
             score -= 500
     else:
-        score = 100*(min(newGhostDistances)-min(oldGhostDistances))
+        score = 100 * (min(newGhostDistances) - min(oldGhostDistances))
    
     return score
 
@@ -121,7 +121,7 @@ class MultiAgentSearchAgent(Agent):
     is another abstract class.
   """
 
-  def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
+  def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
     self.index = 0 # Pacman is always agent index 0
     self.evaluationFunction = util.lookup(evalFn, globals())
     self.depth = int(depth)
@@ -177,18 +177,39 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       All ghosts should be modeled as choosing uniformly at random from their
       legal moves.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return ExpectedMiniMaxDecision(gameState, self.evaluationFunction, self.depth)
 
 def betterEvaluationFunction(currentGameState):
-  """
-    Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-    evaluation function (question 5).
+    """
+      Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
+      evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
-  """
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+      DESCRIPTION: <write something here so we know what you did>
+    """
+
+    pos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+
+    ghostStates = currentGameState.getGhostStates()
+    scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
+
+    ghostDistances = [manhattanDistance(pos,ghostState.getPosition()) for ghostState in ghostStates]
+
+    foodList = food.asList()
+    foodDistances = [manhattanDistance(pos,food) for food in foodList]
+    #print newGhostDistances
+    #print successorGameState
+    #print newPos, newGhostStates[0].getPosition()
+    
+    score = 0
+    if(len(foodDistances) == 0):
+        score = 100000000 * currentGameState.getScore()
+    elif(min(ghostDistances) > 3):
+        score = 100000000 * currentGameState.getScore() + (100 / (min(foodDistances) + 1)) - (1 / (min(ghostDistances) + 1))
+    else:
+        score = -10000 * (min(ghostDistances))
+   
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
