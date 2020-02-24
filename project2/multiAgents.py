@@ -177,7 +177,46 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       All ghosts should be modeled as choosing uniformly at random from their
       legal moves.
     """
-    return ExpectedMiniMaxDecision(gameState, self.evaluationFunction, self.depth)
+    def maxLevel(gameState, depth):
+      currDepth = depth + 1
+      if gameState.isWin() or gameState.isLose() or currDepth == self.depth:
+        return self.evaluationFunction(gameState)
+      maxvalue = -999999
+      actions = gameState.getLegalActions(0)
+      totalmaxvalue = 0
+      numberofactions = len(actions)
+      for action in actions:
+        successor = gameState.generateSuccessor(0, action)
+        maxvalue = max(maxvalue, expectLevel(successor, currDepth, 1))
+      return maxvalue
+
+    def expectLevel(gameState, depth, agentIndex):
+      if gameState.isWin() or gameState.isLose():
+        return self.evaluationFunction(gameState)
+      actions = gameState.getLegalActions(agentIndex)
+      totalexpectedvalue = 0
+      numberofactions = len(actions)
+      for action in actions:
+        successor = gameState.generateSuccessor(agentIndex, action)
+        if agentIndex == (gameState.getNumAgents() - 1):
+          expectedvalue = maxLevel(successor, depth)
+        else:
+          expectedvalue = expectLevel(successor, depth, agentIndex+1)
+        totalexpectedvalue = totalexpectedvalue + expectedvalue
+      if numberofactions == 0:
+        return 0
+      return float(totalexpectedvalue)/float(numberofactions)
+
+    actions = gameState.getLegalActions(0)
+    currentScore = -999999
+    returnAction = ''
+    for action in actions:
+      nextState = gameState.generateSuccessor(0, action)
+      score = expectLevel(nextState, 0, 1)
+      if score > currentScore:
+        returnAction = action
+        currentScore = score
+    return returnAction
 
 def betterEvaluationFunction(currentGameState):
     """

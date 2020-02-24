@@ -13,212 +13,224 @@ import math
 # function MinimaxDecision(state) returns an action (pg 166)
 def MinimaxDecision(state, Utility, maxDepth):
 
-    pacmanIndex = 0
-    firstGhostIndex = 1
+  pacmanIndex = 0
+  firstGhostIndex = 1
 
-    legalActions = state.getLegalActions(pacmanIndex)
-    legalActions.remove('Stop')
+  legalActions = state.getLegalActions(pacmanIndex)
+  legalActions.remove('Stop')
 
-    if(len(legalActions) == 0):
-        print "No Legal Moves - Not sure if this is even possible"
-        return None
+  if(len(legalActions) == 0):
+    print "No Legal Moves - Not sure if this is even possible"
+    return None
 
-    maxValuedAction = legalActions[0]
-    maxValue = -10000000 # Assume all values will not be below this.
+  maxValuedAction = legalActions[0]
+  maxValue = -10000000 # Assume all values will not be below this.
 
-    for action in legalActions :
-        tempValue = MinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, maxDepth)
-        if(tempValue > maxValue):
-            maxValue = tempValue
-            maxValuedAction = action
+  for action in legalActions :
+    tempValue = MinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, maxDepth)
+    if(tempValue > maxValue):
+      maxValue = tempValue
+      maxValuedAction = action
 
-    #print(maxValue)
-    return maxValuedAction
+  #print(maxValue)
+  return maxValuedAction
 
 # function MaxValue(state) returns a utility value (pg 166)
 def MaxValue(state, Utility, depth):
-    # Always decrement depth during Pacman's turn
-    depth -= 1
+  # Always decrement depth during Pacman's turn
+  depth -= 1
 
-    # Check if time to evaluate
-    if TerminalTest(state,depth):
-        return Utility(state)
+  # Check if time to evaluate
+  if TerminalTest(state,depth):
+    return Utility(state)
 
-    pacmanIndex = 0
-    firstGhostIndex = 1
+  pacmanIndex = 0
+  firstGhostIndex = 1
 
-    # Remove stop from Pacman's list of possible moves for better speed at higher depth
-    legalActions = state.getLegalActions(pacmanIndex)
-    legalActions.remove('Stop')
+  # Remove stop from Pacman's list of possible moves for better speed at higher depth
+  legalActions = state.getLegalActions(pacmanIndex)
+  legalActions.remove('Stop')
 
-    return max(MinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, depth) for action in legalActions)
+  return max(MinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, depth) for action in legalActions)
 
 # function MinValue(state) returns a utility value (pg 166)
 def MinValue(state, ghostIndex, Utility, depth):
-    # Check if time to evaluate
-    if TerminalTest(state,depth):
-        return Utility(state)
+  # Check if time to evaluate
+  if TerminalTest(state,depth):
+    return Utility(state)
 
-    numAgents = state.getNumAgents()
-    nextGhostIndex = ghostIndex + 1
-    legalActions = state.getLegalActions(ghostIndex)
+  numAgents = state.getNumAgents()
+  nextGhostIndex = ghostIndex + 1
+  legalActions = state.getLegalActions(ghostIndex)
 
-    # Check for another ghost min layer
-    if nextGhostIndex < numAgents:
-        return min([MinValue(state.generateSuccessor(ghostIndex, action),nextGhostIndex, Utility, depth) for action in legalActions])
-    # Else pacman max layer
-    else:
-        return min([MaxValue(state.generateSuccessor(ghostIndex, action), Utility, depth) for action in legalActions])
+  # Check for another ghost min layer
+  if nextGhostIndex < numAgents:
+    return min([MinValue(state.generateSuccessor(ghostIndex, action),nextGhostIndex, Utility, depth) for action in legalActions])
+  # Else pacman max layer
+  else:
+    return min([MaxValue(state.generateSuccessor(ghostIndex, action), Utility, depth) for action in legalActions])
 
 # Terminal Test for use with MinValue and MaxValue
 def TerminalTest(state,depth):
-    if depth == 0 or state.isWin() or state.isLose():
-        return True
-    else:
-        return False
+  if depth == 0 or state.isWin() or state.isLose():
+    return True
+  else:
+    return False
 
 # CSE 511A Lecture 6 -- Adversarial Search.pptx (Slide 39)
 def AlphaBetaMiniMaxDecsion(state, Utility, maxDepth):
-    pacmanIndex = 0
-    firstGhostIndex = 1
+  pacmanIndex = 0
+  firstGhostIndex = 1
 
-    legalActions = state.getLegalActions(pacmanIndex)
-    legalActions.remove('Stop')
+  legalActions = state.getLegalActions(pacmanIndex)
+  legalActions.remove('Stop')
 
-    if(len(legalActions) == 0):
-        print "No Legal Moves - Not sure if this is even possible"
-        return None
+  if(len(legalActions) == 0):
+    print "No Legal Moves - Not sure if this is even possible"
+    return None
 
-    maxValuedAction = legalActions[0]
-    alpha = -10000000 # Synonymous with max value for this first max layer
-    beta = 10000000 # Ignored in this first layer
+  maxValuedAction = legalActions[0]
+  alpha = -10000000 # Synonymous with max value for this first max layer
+  beta = 10000000 # Ignored in this first layer
 
-    for action in legalActions :
-        tempValue = AlphaBetaMinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, maxDepth, alpha, beta)
-        if(tempValue > alpha):
-            alpha = tempValue
-            maxValuedAction = action
+  for action in legalActions :
+    tempValue = AlphaBetaMinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, maxDepth, alpha, beta)
+    if(tempValue > alpha):
+      alpha = tempValue
+      maxValuedAction = action
 
-    print(alpha)
-    return maxValuedAction
+  print(alpha)
+  return maxValuedAction
 
 # CSE 511A Lecture 6 -- Adversarial Search.pptx (Slide 39)
 def AlphaBetaMaxValue(state, Utility, depth, alpha, beta):
-    # Always decrement depth during Pacman's turn
-    depth -= 1
+  # Always decrement depth during Pacman's turn
+  depth -= 1
 
-    # Check if time to evaluate
-    if TerminalTest(state,depth):
-        return Utility(state)
+  # Check if time to evaluate
+  if TerminalTest(state,depth):
+    return Utility(state)
 
-    pacmanIndex = 0
-    firstGhostIndex = 1
+  pacmanIndex = 0
+  firstGhostIndex = 1
 
-    # Remove stop from Pacman's list of possible moves for better speed at higher depth
-    legalActions = state.getLegalActions(pacmanIndex)
-    legalActions.remove('Stop')
+  # Remove stop from Pacman's list of possible moves for better speed at higher depth
+  legalActions = state.getLegalActions(pacmanIndex)
+  legalActions.remove('Stop')
 
-    v = -1000000
+  v = -1000000
 
-    for action in legalActions:
-        v = max(v, AlphaBetaMinValue(state.generateSuccessor(pacmanIndex, action),firstGhostIndex, Utility, depth, alpha, beta))
-        if(v >= beta):
-            return v
-        alpha = max(alpha,v)
+  for action in legalActions:
+    v = max(v, AlphaBetaMinValue(state.generateSuccessor(pacmanIndex, action),firstGhostIndex, Utility, depth, alpha, beta))
+    if(v >= beta):
+      return v
+    alpha = max(alpha,v)
 
-    return v
+  return v
 
 # CSE 511A Lecture 6 -- Adversarial Search.pptx (Slide 39)
 def AlphaBetaMinValue(state, ghostIndex, Utility, depth, alpha, beta):
-    # Check if time to evaluate
-    if TerminalTest(state,depth):
-        return Utility(state)
+  # Check if time to evaluate
+  if TerminalTest(state,depth):
+    return Utility(state)
 
-    numAgents = state.getNumAgents()
-    nextGhostIndex = ghostIndex + 1
-    legalActions = state.getLegalActions(ghostIndex)
+  numAgents = state.getNumAgents()
+  nextGhostIndex = ghostIndex + 1
+  legalActions = state.getLegalActions(ghostIndex)
 
-    v = 10000000
+  v = 10000000
 
-    # Check for another ghost min layer
-    if nextGhostIndex < numAgents:
-        for action in legalActions:
-            v = min(v, AlphaBetaMinValue(state.generateSuccessor(ghostIndex, action), nextGhostIndex, Utility, depth, alpha, beta))
-            if(v <= alpha):
-                return v
-            beta = max(beta,v)
-
+  # Check for another ghost min layer
+  if nextGhostIndex < numAgents:
+    for action in legalActions:
+      v = min(v, AlphaBetaMinValue(state.generateSuccessor(ghostIndex, action), nextGhostIndex, Utility, depth, alpha, beta))
+      if(v <= alpha):
         return v
-    # Else pacman max layer
-    else:
-        for action in legalActions:
-            successor = state.generateSuccessor(ghostIndex, action)
-            v = min(v, AlphaBetaMaxValue(state.generateSuccessor(ghostIndex, action), Utility, depth, alpha, beta))
-            if(v <= alpha):
-                return v
-            beta = max(beta,v)
+      beta = max(beta,v)
 
+    return v
+  # Else pacman max layer
+  else:
+    for action in legalActions:
+      successor = state.generateSuccessor(ghostIndex, action)
+      v = min(v, AlphaBetaMaxValue(state.generateSuccessor(ghostIndex, action), Utility, depth, alpha, beta))
+      if(v <= alpha):
         return v
+      beta = max(beta,v)
 
-def ExpectedMiniMaxDecision(state, Utility, maxDepth):
+    return v
 
-    pacmanIndex = 0
-    firstGhostIndex = 1
+def ExpectedMiniMaxDecision(gameState, Utility, maxDepth):
+  
+  def maxLevel(gameState, depth):
+    currDepth = depth + 1
+    if gameState.isWin() or gameState.isLose() or currDepth == self.depth:
+      return Utility(gameState)
+    maxvalue = -999999
+    actions = gameState.getLegalActions(0)
+    for action in actions:
+      successor = gameState.generateSuccessor(0, action)
+      maxvalue = max(maxvalue, minLevel(successor, currDepth, 1))
+    return maxvalue
 
-    legalActions = state.getLegalActions(pacmanIndex)
-    legalActions.remove('Stop')
-
-    if(len(legalActions) == 0):
-        print "No Legal Moves - Not sure if this is even possible"
-        return None
-
-    maxValuedAction = legalActions[0]
-    maxValue = -10000000 # Assume all values will not be below this.
-
-    for action in legalActions :
-        tempValue = ExpectedMinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, maxDepth)
-        if(tempValue > maxValue):
-            maxValue = tempValue
-            maxValuedAction = action
-
-    #print(maxValue)
-    return maxValuedAction
-
+  def minLevel(gameState, depth, agentIndex):
+    minvalue = 999999
+    if gameState.isWin() or gameState.isLose():
+      return Utility(gameState)
+    actions = gameState.getLegalActions(agentIndex)
+    for action in actions:
+      successor = gameState.generateSuccessor(agentIndex, action)
+      if agentIndex == (gameState.getNumAgents() - 1):
+        minvalue = min(minvalue, maxLevel(successor, depth))
+      else:
+        minvalue = min(minvalue, minLevel(successor, depth, agentIndex+1))
+    return minvalue
+    
+    actions = gameState.getLegalActions(0)
+    currentScore = -999999
+    returnAction = ''
+    for action in actions:
+      nextState = gameState.generateSuccessor(0, action)
+      score = minLevel(nextState, 0, 1)
+      if score > currentScore:
+        returnAction = action
+        currentScore = score
+    return returnAction
 
 # function MaxValue(state) returns a utility value (pg 166)
 def ExpectedMaxValue(state, Utility, depth):
-    # Always decrement depth during Pacman's turn
-    depth -= 1
+  # Always decrement depth during Pacman's turn
+  depth -= 1
 
-    # Check if time to evaluate
-    if TerminalTest(state,depth):
-        return Utility(state)
+  # Check if time to evaluate
+  if TerminalTest(state,depth):
+    return Utility(state)
 
-    pacmanIndex = 0
-    firstGhostIndex = 1
+  pacmanIndex = 0
+  firstGhostIndex = 1
 
-    # Remove stop from Pacman's list of possible moves for better speed at higher depth
-    legalActions = state.getLegalActions(pacmanIndex)
-    legalActions.remove('Stop')
+  # Remove stop from Pacman's list of possible moves for better speed at higher depth
+  legalActions = state.getLegalActions(pacmanIndex)
+  legalActions.remove('Stop')
 
-    return max(ExpectedMinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, depth) for action in legalActions)
+  return max(ExpectedMinValue(state.generateSuccessor(pacmanIndex, action), firstGhostIndex, Utility, depth) for action in legalActions)
 
 # function MinValue(state) returns a utility value (pg 166)
 def ExpectedMinValue(state, ghostIndex, Utility, depth):
-    # Check if time to evaluate
-    if TerminalTest(state,depth):
-        return Utility(state)
+  # Check if time to evaluate
+  if TerminalTest(state,depth):
+    return Utility(state)
 
-    numAgents = state.getNumAgents()
-    nextGhostIndex = ghostIndex + 1
-    legalActions = state.getLegalActions(ghostIndex)
+  numAgents = state.getNumAgents()
+  nextGhostIndex = ghostIndex + 1
+  legalActions = state.getLegalActions(ghostIndex)
 
-    # Check for another ghost min layer
-    if nextGhostIndex < numAgents:
-        return sum([ExpectedMinValue(state.generateSuccessor(ghostIndex, action),nextGhostIndex, Utility, depth) for action in legalActions])/numAgents
-    # Else pacman max layer
-    else:
-        return sum([ExpectedMaxValue(state.generateSuccessor(ghostIndex, action), Utility, depth) for action in legalActions])/numAgents
+  # Check for another ghost min layer
+  if nextGhostIndex < numAgents:
+    return sum([ExpectedMinValue(state.generateSuccessor(ghostIndex, action),nextGhostIndex, Utility, depth) for action in legalActions])/numAgents
+  # Else pacman max layer
+  else:
+    return sum([ExpectedMaxValue(state.generateSuccessor(ghostIndex, action), Utility, depth) for action in legalActions])/numAgents
 
 def mazeDistance(point1, point2, gameState):
   """
