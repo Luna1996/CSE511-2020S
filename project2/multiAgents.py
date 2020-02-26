@@ -13,6 +13,7 @@ from mypy import MinimaxDecision, AlphaBetaMiniMaxDecsion, ExpectedMiniMaxDecisi
 
 from game import Agent
 
+
 class ReflexAgent(Agent):
   """
     A reflex agent chooses an action at each choice point by examining
@@ -22,7 +23,6 @@ class ReflexAgent(Agent):
     it in any way you see fit, so long as you don't touch our method
     headers.
   """
-
 
   def getAction(self, gameState):
     """
@@ -37,14 +37,16 @@ class ReflexAgent(Agent):
     legalMoves = gameState.getLegalActions()
 
     # Choose one of the best actions
-    scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+    scores = [self.evaluationFunction(gameState, action)
+                                      for action in legalMoves]
     bestScore = max(scores)
-    bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-    chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+    bestIndices = [index for index in range(
+        len(scores)) if scores[index] == bestScore]
+    chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
 
     "Add more of your code here if you want to"
 
-    #print legalMoves[chosenIndex]
+    # print legalMoves[chosenIndex]
     return legalMoves[chosenIndex]
 
   def evaluationFunction(self, currentGameState, action):
@@ -75,26 +77,31 @@ class ReflexAgent(Agent):
     newGhostStates = successorGameState.getGhostStates()
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-    newGhostDistances = [manhattanDistance(newPos,ghostState.getPosition()) for ghostState in newGhostStates]
-    oldGhostDistances = [manhattanDistance(oldPos,ghostState.getPosition()) for ghostState in oldGhostStates]
+    newGhostDistances = [manhattanDistance(
+        newPos, ghostState.getPosition()) for ghostState in newGhostStates]
+    oldGhostDistances = [manhattanDistance(
+        oldPos, ghostState.getPosition()) for ghostState in oldGhostStates]
 
     newFoodList = newFood.asList()
-    newFoodDistances = [manhattanDistance(newPos,food) for food in newFoodList]
-    #print newGhostDistances
-    #print successorGameState
-    #print newPos, newGhostStates[0].getPosition()
-    
+    newFoodDistances = [manhattanDistance(
+        newPos, food) for food in newFoodList]
+    # print newGhostDistances
+    # print successorGameState
+    # print newPos, newGhostStates[0].getPosition()
+
     score = 0
     if(len(newFoodDistances) == 0):
         score = 100000000 * successorGameState.getScore()
     elif(min(newGhostDistances) > 2):
-        score = 100000000 * successorGameState.getScore() + (100 / (min(newFoodDistances) + 1)) - (1 / (min(newGhostDistances) + 1))
+        score = 100000000 * successorGameState.getScore() + (100 / (min(newFoodDistances) + 1)
+                                                        ) - (1 / (min(newGhostDistances) + 1))
         if(action == Directions.STOP):
             score -= 500
     else:
         score = 100 * (min(newGhostDistances) - min(oldGhostDistances))
-   
+
     return score
+
 
 def scoreEvaluationFunction(currentGameState):
   """
@@ -105,6 +112,7 @@ def scoreEvaluationFunction(currentGameState):
     (not reflex agents).
   """
   return currentGameState.getScore()
+
 
 class MultiAgentSearchAgent(Agent):
   """
@@ -122,9 +130,10 @@ class MultiAgentSearchAgent(Agent):
   """
 
   def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-    self.index = 0 # Pacman is always agent index 0
+    self.index = 0  # Pacman is always agent index 0
     self.evaluationFunction = util.lookup(evalFn, globals())
     self.depth = int(depth)
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
   """
@@ -152,6 +161,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns the total number of agents in the game
     """
     return MinimaxDecision(gameState, self.evaluationFunction, self.depth)
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
@@ -218,43 +228,50 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         currentScore = score
     return returnAction
 
+
 def betterEvaluationFunction(currentGameState):
-    """
-      Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-      evaluation function (question 5).
+  newPos = currentGameState.getPacmanPosition()
+  newFood = currentGameState.getFood()
+  newGhostStates = currentGameState.getGhostStates()
+  newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-      DESCRIPTION: <write something here so we know what you did>
-    """
+  """ Manhattan distance to the foods from the current state """
+  foodList = newFood.asList()
+  from util import manhattanDistance
+  foodDistance = [0]
+  for pos in foodList:
+    foodDistance.append(manhattanDistance(newPos, pos))
 
-    pos = currentGameState.getPacmanPosition()
-    food = currentGameState.getFood()
-    capsules = currentGameState.getCapsules()
+  """ Manhattan distance to each ghost from the current state"""
+  ghostPos = []
+  for ghost in newGhostStates:
+    ghostPos.append(ghost.getPosition())
+  ghostDistance = [0]
+  for pos in ghostPos:
+    ghostDistance.append(manhattanDistance(newPos, pos))
 
-    ghostStates = currentGameState.getGhostStates()
-    scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
+  numberofPowerPellets = len(currentGameState.getCapsules())
 
-    ghostDistances = [manhattanDistance(pos,ghostState.getPosition()) for ghostState in ghostStates]
+  score = 0
+  numberOfNoFoods = len(newFood.asList(False))
+  sumScaredTimes = sum(newScaredTimes)
+  sumGhostDistance = sum(ghostDistance)
+  reciprocalfoodDistance = 0
+  if sum(foodDistance) > 0:
+    reciprocalfoodDistance = 1.0 / sum(foodDistance)
 
-    foodList = food.asList()
-    foodDistances = [manhattanDistance(pos,food) for food in foodList]
+  score += currentGameState.getScore() + reciprocalfoodDistance + numberOfNoFoods
 
-    capsulePosition = pos in capsules
-    #print newGhostDistances
-    #print successorGameState
-    #print newPos, newGhostStates[0].getPosition()
-    
-    score = 0
-    if(len(foodDistances) == 0):
-        score = 100000000 * currentGameState.getScore()
-    elif(min(ghostDistances) > 1):
-        score = 1000000 * currentGameState.getScore() + (100 / (min(foodDistances) + 1)) - (1 / (min(ghostDistances) + 1)) - 1000*len(capsules)
-    else:
-        score = -10000000 * (min(ghostDistances))
-   
-    return score
+  if sumScaredTimes > 0:
+    score += sumScaredTimes + \
+        (-1 * numberofPowerPellets) + (-1 * sumGhostDistance)
+  else:
+    score += sumGhostDistance + numberofPowerPellets
+  return score
 
-# Abbreviation
+
 better = betterEvaluationFunction
+
 
 class ContestAgent(MultiAgentSearchAgent):
   """
